@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wallet Modal</title>
+    <title>CS2 Platform - Responsive Pure Crypto</title>
     <style>
         :root {
             --bg-main: #0b0e14;
@@ -15,6 +15,7 @@
             --accent-green: #10b981;
             --accent-yellow: #ca8a04;
             --border-color: #242c3e;
+            --danger-red: #ef4444;
         }
 
         * {
@@ -22,501 +23,319 @@
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            user-select: none;
         }
 
         body {
             background-color: var(--bg-main);
             color: var(--text-main);
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            padding: 20px;
             min-height: 100vh;
+            gap: 20px;
         }
 
-        /* Стилі модального вікна */
-        .modal-wallet {
-            background-color: var(--bg-modal);
+        /* АДАПТИВНИЙ КОНТЕЙНЕР ПЛАТФОРМИ */
+        .container {
             width: 100%;
-            max-width: 680px;
-            border-radius: 12px;
-            padding: 24px;
-            position: relative;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-        }
-
-        /* Шапка вікна */
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .modal-title {
-            font-size: 24px;
-            font-weight: 700;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .bonus-badge {
-            background-color: rgba(16, 185, 129, 0.1);
-            color: var(--accent-green);
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-weight: 700;
-            font-size: 12px;
-            text-transform: uppercase;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            border: 1px solid rgba(16, 185, 129, 0.2);
-        }
-
-        .close-btn {
-            background-color: var(--bg-card);
-            border: none;
-            color: var(--text-muted);
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 18px;
-            transition: all 0.2s;
-        }
-
-        .close-btn:hover {
-            color: var(--text-main);
-            background-color: var(--bg-card-hover);
-        }
-
-        /* Навігація / Таби */
-        .modal-tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 24px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 16px;
-        }
-
-        .tab-btn {
-            background-color: transparent;
-            border: none;
-            color: var(--text-muted);
-            padding: 8px 16px;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-            border-radius: 6px;
-            text-transform: uppercase;
-            transition: all 0.2s;
-        }
-
-        .tab-btn:hover {
-            color: var(--text-main);
-            background-color: rgba(255, 255, 255, 0.05);
-        }
-
-        .tab-btn.active {
-            color: var(--text-main);
-            background-color: var(--bg-card);
-        }
-
-        /* Контент вкладок */
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Секції */
-        .section-title {
-            font-size: 14px;
-            color: var(--text-main);
-            font-weight: 700;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .new-badge {
-            background-color: #3b82f6;
-            color: white;
-            font-size: 10px;
-            padding: 2px 6px;
-            border-radius: 4px;
-            text-transform: uppercase;
-        }
-
-        .methods-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        /* Картки методів */
-        .method-card {
-            background-color: var(--bg-card);
-            border: 1px solid transparent;
-            border-radius: 8px;
-            padding: 12px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .method-card:hover {
-            background-color: var(--bg-card-hover);
-            transform: translateY(-2px);
-        }
-
-        .method-icon {
-            width: 40px;
-            height: 40px;
-            background-color: rgba(255, 255, 255, 0.05);
-            border-radius: 6px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: bold;
-            font-size: 12px;
-            color: #fff;
-            flex-shrink: 0;
-        }
-
-        /* Кастомні кольори заглушок іконок */
-        .icon-crypto { background: linear-gradient(135deg, #f59e0b, #3b82f6); }
-        .icon-master { background: #eb001b; }
-        .icon-visa { background: #1a1f71; }
-        .icon-apple { background: #000000; }
-        .icon-google { background: #4285f4; }
-        .icon-paypal { background: #003087; }
-        .icon-binance { background: #f3ba2f; color: #000; }
-        .icon-coinbase { background: #0052ff; }
-        .icon-skins { background: #4338ca; }
-
-        .method-info {
+            max-width: 1000px;
             display: flex;
             flex-direction: column;
+            gap: 20px;
         }
 
-        .method-name {
-            font-size: 13px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .method-sub {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-
-        /* Реферальний код */
-        .referral-block {
-            margin-top: 24px;
-            border-top: 1px solid var(--border-color);
-            padding-top: 20px;
-        }
-
-        .referral-label {
-            font-size: 12px;
-            color: var(--text-muted);
-            font-weight: 700;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-        }
-
-        .referral-input-wrap {
+        /* ТОР-БАР */
+        .top-bar {
+            width: 100%;
             display: flex;
-            gap: 12px;
-        }
-
-        .referral-input {
-            flex-grow: 1;
-            background-color: #0b0e14;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 15px;
+            background: var(--bg-modal);
+            padding: 12px 24px;
+            border-radius: 8px;
             border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 12px;
-            color: white;
-            font-weight: 600;
-            outline: none;
         }
 
-        .referral-btn {
-            background-color: var(--accent-yellow);
+        .balance-display {
+            font-size: 16px;
+            font-weight: 700;
+            color: #f59e0b;
+            background: rgba(245, 158, 11, 0.1);
+            padding: 6px 16px;
+            border-radius: 6px;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .open-wallet-btn {
+            background: var(--accent-green);
             color: #000;
             border: none;
-            padding: 0 24px;
-            border-radius: 6px;
+            padding: 8px 20px;
             font-weight: 700;
+            border-radius: 6px;
             cursor: pointer;
             text-transform: uppercase;
-            transition: opacity 0.2s;
+            transition: background 0.2s;
+        }
+        .open-wallet-btn:hover { background: #0ece7e; }
+
+        /* ІГРИ (ГРИД З АДАПТИВНІСТЮ СТОРІНКИ) */
+        .games-section { width: 100%; }
+        .games-title { font-size: 18px; font-weight: 700; margin-bottom: 15px; display: flex; align-items: center; gap: 6px; }
+        
+        .games-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 16px; 
         }
 
-        .referral-btn:hover {
-            opacity: 0.9;
+        @media (max-width: 768px) {
+            .games-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 480px) {
+            .games-grid { grid-template-columns: 1fr; }
         }
 
-        .timer-text {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: 8px;
+        .game-card {
+            height: 140px; border-radius: 12px; overflow: hidden; cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s; display: flex; align-items: flex-end; padding: 16px;
         }
+        .game-card:hover { transform: translateY(-4px); box-shadow: 0 8px 16px rgba(0,0,0,0.3); }
+        .game-card.active-playing { border: 2px solid #3b82f6; }
+        .game-cases { background: linear-gradient(135deg, #d97706, #78350f); }
+        .game-battles { background: linear-gradient(135deg, #dc2626, #7f1d1d); }
+        .game-double { background: linear-gradient(135deg, #2563eb, #1e3a8a); }
+        .game-upgrader { background: linear-gradient(135deg, #7c3aed, #4c1d95); }
+        .game-label { background: rgba(0, 0, 0, 0.6); padding: 6px 14px; border-radius: 6px; font-weight: 800; font-size: 13px; text-transform: uppercase; }
 
-        .timer-text span {
-            color: var(--text-main);
-            font-weight: 600;
-        }
+        /* ІГРОВА ЗОНА */
+        .game-play-zone { width: 100%; background: var(--bg-modal); border-radius: 12px; padding: 24px; border: 1px solid var(--border-color); display: none; }
+        .game-play-zone.active { display: block; }
+        .game-interface { display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 10px 0; }
+        .bet-input { background: var(--bg-main); border: 1px solid var(--border-color); padding: 10px; border-radius: 6px; color: #fff; text-align: center; font-weight: 700; width: 120px; }
+        .action-btn { background: #f59e0b; color: #000; border: none; padding: 12px 30px; font-weight: 700; border-radius: 6px; cursor: pointer; text-transform: uppercase; }
 
-        /* Футер для вкладки виведення */
-        .redeem-footer {
-            text-align: center;
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-top: 24px;
+        /* МОДАЛЬНЕ ВІКНО */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 100; padding: 15px; }
+        .modal-overlay.active { display: flex; }
+        
+        .modal-wallet { 
+            background-color: var(--bg-modal); 
+            width: 100%; 
+            max-width: 480px; 
+            border-radius: 12px; 
+            padding: 24px; 
+            position: relative; 
+            max-height: 95vh; 
+            overflow-y: auto; 
         }
+        
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .modal-title { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .back-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 18px; display: none; }
+        .close-btn { background: var(--bg-card); border: none; color: var(--text-muted); width: 32px; height: 32px; border-radius: 6px; cursor: pointer; font-size: 18px; }
 
-        .redeem-footer a {
-            color: var(--text-main);
-            text-decoration: none;
-            font-weight: 600;
-        }
+        /* ДЕПОЗИТ КРИПТИ (ПО СТАНДАРТУ СКРІНШОТІВ) */
+        .crypto-deposit-screen { display: flex; flex-direction: column; gap: 16px; }
+        .promo-banner { background: rgba(16, 185, 129, 0.1); color: var(--accent-green); padding: 12px; border-radius: 6px; font-weight: 600; font-size: 13px; text-align: center; border: 1px solid rgba(16, 185, 129, 0.15); }
+        
+        .field-label { font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
+        .crypto-select { background: #0b0e14; border: 1px solid var(--border-color); width: 100%; padding: 12px; color: white; border-radius: 6px; font-weight: 600; outline: none; }
+        
+        .address-container { display: flex; background: #0b0e14; border: 1px solid var(--border-color); border-radius: 6px; align-items: center; padding-right: 12px; }
+        .address-input { flex-grow: 1; background: transparent; border: none; padding: 12px; color: #a1a1aa; font-family: monospace; font-size: 13px; outline: none; text-overflow: ellipsis; }
+        .copy-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 15px; }
+        .copy-btn:hover { color: white; }
 
-        .redeem-footer a:hover {
-            text-decoration: underline;
+        /* БЛОК З КВАДРАТНИМ QR */
+        .qr-info-block { display: flex; gap: 16px; background: rgba(28, 34, 48, 0.3); padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); }
+        
+        /* Чіткі розміри щоб QR завжди залишався рівним 1:1 */
+        .qr-wrapper {
+            width: 100px;
+            min-width: 100px;
+            height: 100px;
+            background: white;
+            padding: 6px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            aspect-ratio: 1 / 1; /* Квадратний формат */
         }
+        .qr-wrapper img { width: 100%; height: 100%; object-fit: contain; }
+
+        .info-text-box { display: flex; flex-direction: column; justify-content: center; font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+        .info-text-box strong { color: white; }
+
+        .danger-alert { border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; background: rgba(239, 68, 68, 0.04); padding: 10px 14px; border-radius: 6px; font-size: 11px; font-weight: 600; text-align: center; }
+
+        /* КОЇН КАЛЬКУЛЯТОР */
+        .calc-row { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+        .calc-input-wrap { flex: 1; background: #0b0e14; border: 1px solid var(--border-color); border-radius: 6px; display: flex; align-items: center; padding: 0 12px; }
+        .calc-icon { margin-right: 8px; font-size: 13px; }
+        .calc-input { background: transparent; border: none; width: 100%; padding: 12px 0; color: white; font-weight: 700; outline: none; font-size: 14px; }
+        .swap-arrow { color: var(--text-muted); font-size: 16px; }
+        .calc-footer-note { font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 6px; line-height: 1.4; }
     </style>
 </head>
 <body>
 
-    <div class="modal-wallet">
-        <div class="modal-header">
-            <div class="modal-title">Wallet</div>
-            <div class="header-right">
-                <div class="bonus-badge">
-                    +5% Deposit Bonus ℹ
-                </div>
-                <button class="close-btn">&times;</button>
+    <div class="container">
+        <div class="top-bar">
+            <div class="balance-display">Баланс: $<span id="user-balance">100.00</span></div>
+            <button class="open-wallet-btn" onclick="toggleWallet(true)">Deposit</button>
+        </div>
+
+        <div class="games-section">
+            <div class="games-title">🎮 Games</div>
+            <div class="games-grid">
+                <div class="game-card game-cases" id="card-cases" onclick="selectGame('cases')"><div class="game-label">Cases</div></div>
+                <div class="game-card game-battles" id="card-battles" onclick="selectGame('battles')"><div class="game-label">Battles</div></div>
+                <div class="game-card game-double" id="card-double" onclick="selectGame('double')"><div class="game-label">Double</div></div>
+                <div class="game-card game-upgrader" id="card-upgrader" onclick="selectGame('upgrader')"><div class="game-label">Upgrader</div></div>
             </div>
         </div>
 
-        <div class="modal-tabs">
-            <button class="tab-btn active" onclick="switchTab('deposit')">Deposit</button>
-            <button class="tab-btn" onclick="switchTab('redeem')">Redeem</button>
-            <button class="tab-btn" onclick="switchTab('coupons')">Coupons</button>
-        </div>
-
-        <div id="deposit-content" class="tab-content active">
-            <div class="section-title">Deposit Options</div>
-            <div class="methods-grid">
-                <div class="method-card">
-                    <div class="method-icon icon-crypto">₿</div>
-                    <div class="method-info">
-                        <div class="method-name">Crypto</div>
-                        <div class="method-sub">0% Fee</div>
-                    </div>
-                </div>
-                <div class="method-card">
-                    <div class="method-icon icon-master">MC</div>
-                    <div class="method-info">
-                        <div class="method-name">Mastercard</div>
-                        <div class="method-sub">Zen</div>
-                    </div>
-                </div>
-                <div class="method-card">
-                    <div class="method-icon icon-visa">V</div>
-                    <div class="method-info">
-                        <div class="method-name">Visa</div>
-                        <div class="method-sub">Swapped</div>
-                    </div>
-                </div>
-                <div class="method-card">
-                    <div class="method-icon icon-apple"></div>
-                    <div class="method-info">
-                        <div class="method-name">Apple Pay</div>
-                        <div class="method-sub">Mastercard</div>
-                    </div>
-                </div>
-                <div class="method-card">
-                    <div class="method-icon icon-google">G</div>
-                    <div class="method-info">
-                        <div class="method-name">Google Pay</div>
-                        <div class="method-sub">Mastercard</div>
-                    </div>
-                </div>
-                <div class="method-card">
-                    <div class="method-icon icon-paypal">P</div>
-                    <div class="method-info">
-                        <div class="method-name">Gift Cards</div>
-                        <div class="method-sub">Kinguin</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="section-title">Exchanges & Wallets <span class="new-badge">New</span></div>
-            <div class="methods-grid">
-                <div class="method-card">
-                    <div class="method-icon icon-binance">🔶</div>
-                    <div class="method-info">
-                        <div class="method-name">Binance</div>
-                        <div class="method-sub">New</div>
-                    </div>
-                </div>
-                <div class="method-card">
-                    <div class="method-icon icon-coinbase">🛡️</div>
-                    <div class="method-info">
-                        <div class="method-name">Coinbase</div>
-                        <div class="method-sub">New</div>
-                    </div>
-                </div>
-                <div class="method-card">
-                    <div class="method-icon icon-crypto">🌐</div>
-                    <div class="method-info">
-                        <div class="method-name">Other</div>
-                        <div class="method-sub">New</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="section-title">Other</div>
-            <div class="methods-grid">
-                <div class="method-card">
-                    <div class="method-icon icon-skins">CS2</div>
-                    <div class="method-info">
-                        <div class="method-name">CS2 Skins</div>
-                        <div class="method-sub">Skindeck</div>
-                    </div>
-                </div>
-                <div class="method-card">
-                    <div class="method-icon icon-skins">CS2</div>
-                    <div class="method-info">
-                        <div class="method-name">CS2 Skins</div>
-                        <div class="method-sub">Skinsback</div>
-                    </div>
-                </div>
-                <div class="method-card">
-                    <div class="method-icon icon-master">💳</div>
-                    <div class="method-info">
-                        <div class="method-name">Cards & More</div>
-                        <div class="method-sub">Zen</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="referral-block">
-                <div class="referral-label">Referral code</div>
-                <div class="referral-input-wrap">
-                    <input type="text" class="referral-input" value="alynnush" readonly>
-                    <button class="referral-btn">Redeemed</button>
-                </div>
-                <div class="timer-text">Code can be changed in <span id="countdown">00:09:32:10</span></div>
+        <div class="game-play-zone" id="play-zone">
+            <h2 id="active-game-title" style="text-transform: uppercase; margin-bottom: 10px; font-size: 16px;">Гра</h2>
+            <div id="interface-cases" class="game-interface" style="display:none;">
+                <p>Вартість відкриття кейсу: <strong>$10.00</strong></p>
+                <div id="case-result" style="font-size: 16px; font-weight: bold; color: #ca8a04; min-height: 20px;"></div>
+                <button class="action-btn" onclick="playCases()">Відкрити</button>
             </div>
         </div>
+    </div>
 
-        <div id="redeem-content" class="tab-content">
-            <div class="section-title">Redemption Options</div>
-            <div class="methods-grid">
-                <div class="method-card">
-                    <div class="method-icon icon-skins">CS2</div>
-                    <div class="method-info">
-                        <div class="method-name">CS2 Skins</div>
-                        <div class="method-sub">Skindeck</div>
+    <div class="modal-overlay" id="wallet-modal">
+        <div class="modal-wallet">
+            
+            <div class="modal-header">
+                <div class="modal-title">
+                    <span id="wallet-header-title">Deposit with Crypto</span>
+                </div>
+                <button class="close-btn" onclick="toggleWallet(false)">&times;</button>
+            </div>
+
+            <div class="crypto-deposit-screen">
+                <div class="promo-banner">Promotion active: +5% Deposit Bonus</div>
+                
+                <div>
+                    <div class="field-label">Currency</div>
+                    <select class="crypto-select">
+                        <option>🪙 LTC (Litecoin)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <div class="field-label">Deposit address</div>
+                    <div class="address-container">
+                        <input type="text" class="address-input" id="deposit-address-field" value="ltc1qa2cphrk74vepmm5e6gel7rafyxtglx9vrqrry7" readonly>
+                        <button class="copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('deposit-address-field').value); alert('Адресу скопійовано!')">📋</button>
                     </div>
                 </div>
-                <div class="method-card">
-                    <div class="method-icon icon-skins">CS2</div>
-                    <div class="method-info">
-                        <div class="method-name">CS2 Skins</div>
-                        <div class="method-sub">Skinsback</div>
+
+                <div class="qr-info-block">
+                    <div class="qr-wrapper">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=ltc1qa2cphrk74vepmm5e6gel7rafyxtglx9vrqrry7" alt="LTC QR">
+                    </div>
+                    <div class="info-text-box">
+                        <p>Send the amount of Litecoin of your choice to the following address to receive the equivalent in coins.</p>
+                        <p style="margin-top: 6px;"><strong>Minimum deposit: $10.00 USD</strong> ℹ</p>
+                        <p>Required confirmations: 2</p>
+                    </div>
+                </div>
+
+                <div class="danger-alert">
+                    Only deposit over the LTC network. Do not use BNB or BSC networks
+                </div>
+
+                <div>
+                    <div class="field-label">Coin Calculator</div>
+                    <div class="calc-row">
+                        <div class="calc-input-wrap">
+                            <span class="calc-icon">🟡</span>
+                            <input type="number" class="calc-input" id="calc-coins" value="100" oninput="convertCoinsToLtc()">
+                        </div>
+                        <div class="swap-arrow">⇄</div>
+                        <div class="calc-input-wrap">
+                            <span class="calc-icon">🪙</span>
+                            <input type="number" class="calc-input" id="calc-ltc" value="0.769230" oninput="convertLtcToCoins()">
+                        </div>
+                    </div>
+                    <div class="calc-footer-note">
+                        The exchange rate shown above is an estimate. The final rate is determined by the time of the transaction.
                     </div>
                 </div>
             </div>
 
-            <div class="section-title">Alternative Options</div>
-            <div class="methods-grid">
-                <div class="method-card">
-                    <div class="method-icon icon-crypto">₿</div>
-                    <div class="method-info">
-                        <div class="method-name">Crypto</div>
-                        <div class="method-sub">Rain</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="redeem-footer">
-                Learn more <a href="#">about Rain's redemption options.</a>
-            </div>
         </div>
-
-        <div id="coupons-content" class="tab-content">
-            <div class="section-title">Coupons & Promo Codes</div>
-            <div class="referral-input-wrap">
-                <input type="text" class="referral-input" placeholder="Enter active coupon code...">
-                <button class="referral-btn" style="background-color: var(--accent-green); color: #fff;">Apply</button>
-            </div>
-        </div>
-
     </div>
 
     <script>
-        // Функція для перемикання вкладок
-        function switchTab(tabName) {
-            // Кнопки
-            const buttons = document.querySelectorAll('.tab-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            
-            // Контент
-            const contents = document.querySelectorAll('.tab-content');
-            contents.forEach(content => content.classList.remove('active'));
+        let balance = 100.00;
+        const LTC_PRICE_USD = 65.00; // Фіксована константа ціни за 1 LTC для калькулятора
 
-            // Активація поточної
-            event.target.classList.add('active');
-            document.getElementById(`${tabName}-content`).classList.add('active');
+        function updateBalanceDisplay() {
+            document.getElementById('user-balance').innerText = balance.toFixed(2);
         }
 
-        // Проста симуляція цокання таймера зворотного відліку
-        let seconds = 10;
-        let minutes = 32;
-        let hours = 9;
-        let days = 0;
-
-        setInterval(() => {
-            if (seconds > 0) {
-                seconds--;
-            } else {
-                seconds = 59;
-                if (minutes > 0) {
-                    minutes--;
-                } else {
-                    minutes = 59;
-                    if (hours > 0) {
-                        hours--;
-                    } else {
-                        hours = 23;
-                        if (days > 0) days--;
-                    }
-                }
+        function toggleWallet(show) {
+            document.getElementById('wallet-modal').classList.toggle('active', show);
+            if(show) {
+                // Скидаємо розрахунок на 100 коїнів за дефолтом при відкритті
+                document.getElementById('calc-coins').value = 100;
+                convertCoinsToLtc();
             }
+        }
 
-            const format = (num) => String(num).padStart(2, '0');
-            document.getElementById('countdown').innerText = 
-                `${format(days)}:${format(hours)}:${format(minutes)}:${format(seconds)}`;
-        }, 1000);
+        // 1 коін = 0.5$ (тобто 100 коїнів = $50. $50 ділимо на курс LTC ($65) = 0.769230 LTC)
+        function convertCoinsToLtc() {
+            const coinsInput = document.getElementById('calc-coins');
+            const ltcInput = document.getElementById('calc-ltc');
+            
+            let coins = parseFloat(coinsInput.value);
+            if (isNaN(coins) || coins < 0) coins = 0;
+
+            let totalUsd = coins * 0.5;
+            let totalLtc = totalUsd / LTC_PRICE_USD;
+
+            ltcInput.value = totalLtc.toFixed(6);
+        }
+
+        function convertLtcToCoins() {
+            const coinsInput = document.getElementById('calc-coins');
+            const ltcInput = document.getElementById('calc-ltc');
+            
+            let ltc = parseFloat(ltcInput.value);
+            if (isNaN(ltc) || ltc < 0) ltc = 0;
+
+            let totalUsd = ltc * LTC_PRICE_USD;
+            let coins = totalUsd / 0.5;
+
+            coinsInput.value = Math.round(coins);
+        }
+
+        // ПРОСТЕ ПЕРЕМИКАННЯ ІГОР
+        function selectGame(game) {
+            document.querySelectorAll('.game-card').forEach(c => c.classList.remove('active-playing'));
+            document.getElementById(`card-${game}`).classList.add('active-playing');
+            document.getElementById('play-zone').classList.add('active');
+            document.getElementById('active-game-title').innerText = game;
+            document.getElementById('interface-cases').style.display = game === 'cases' ? 'flex' : 'none';
+        }
+
+        function playCases() {
+            if (balance < 10) return alert("Недостатньо коштів на балансі!");
+            balance -= 10;
+            let prize = (Math.random() * 20).toFixed(2);
+            balance += parseFloat(prize);
+            updateBalanceDisplay();
+            document.getElementById('case-result').innerText = `Випав предмет вартістю $${prize}`;
+        }
     </script>
 </body>
 </html>
