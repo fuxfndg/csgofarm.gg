@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CS2 Platform - Double Roulette</title>
+    <title>CS2 Platform - Double Roulette with Chat</title>
     <style>
         :root {
             --bg-main: #0b0e14;
@@ -34,11 +34,20 @@
             background-color: var(--bg-main);
             color: var(--text-main);
             display: flex;
+            padding: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* MAIN LAYOUT (LEFT OF CHAT) */
+        .main-layout {
+            flex-grow: 1;
+            display: flex;
             flex-direction: column;
             align-items: center;
             padding: 20px;
-            min-height: 100vh;
-            gap: 20px;
+            transition: margin-right 0.3s ease;
+            width: 100%;
         }
 
         .container {
@@ -156,25 +165,26 @@
             gap: 6px;
             width: max-content;
             will-change: transform;
+            padding-left: 0;
         }
 
         .roulette-cell {
             width: 75px;
             min-width: 75px;
             height: 75px;
-            background: var(--bg-card);
             border-radius: 8px;
             display: flex;
             justify-content: center;
             align-items: center;
             font-size: 24px;
             font-weight: 700;
+            box-sizing: border-box;
         }
 
-        .cell-t { background: linear-gradient(135deg, #4c3c15, #241c05); border: 1px solid var(--color-t); color: var(--color-t); }
-        .cell-rain { background: linear-gradient(135deg, #1d3a8a, #0f172a); border: 1px solid var(--color-rain); color: #60a5fa; }
-        .cell-ct { background: linear-gradient(135deg, #2b2f3a, #12151c); border: 1px solid var(--color-ct); color: #9ca3af; }
-        .cell-bait { background: linear-gradient(135deg, #064e3b, #022c22); border: 1px solid var(--color-bait); color: var(--color-bait); }
+        .cell-t { background: linear-gradient(135deg, #4c3c15, #241c05); border: 2px solid var(--color-t); color: var(--color-t); }
+        .cell-rain { background: linear-gradient(135deg, #1d3a8a, #0f172a); border: 2px solid var(--color-rain); color: #60a5fa; }
+        .cell-ct { background: linear-gradient(135deg, #2b2f3a, #12151c); border: 2px solid var(--color-ct); color: #9ca3af; }
+        .cell-bait { background: linear-gradient(135deg, #064e3b, #022c22); border: 2px solid var(--color-bait); color: var(--color-bait); }
 
         .cell-center-status {
             position: absolute;
@@ -194,6 +204,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
+            pointer-events: none;
         }
         .cell-center-status span { color: white; font-size: 14px; margin-top: 2px; font-family: monospace; }
 
@@ -227,11 +238,17 @@
         .bet-util-btn {
             background: var(--bg-card); border: 1px solid var(--border-color); color: white; padding: 8px 12px; border-radius: 4px; font-size: 11px; font-weight: 700; cursor: pointer;
         }
+        .bet-util-btn:disabled, .side-bet-card.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
 
         .bet-selectors-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
         .side-bet-card {
             background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; cursor: pointer; display: flex; flex-direction: column; gap: 10px;
+            transition: background 0.2s;
         }
+        .side-bet-card:not(.disabled):hover { background: var(--bg-card-hover); }
         .side-header { display: flex; justify-content: space-between; align-items: center; }
         .side-title { font-size: 12px; font-weight: 800; text-transform: uppercase; }
         
@@ -246,81 +263,239 @@
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 100; }
         .modal-overlay.active { display: flex; }
         .modal-wallet { background-color: var(--bg-modal); width: 100%; max-width: 450px; border-radius: 12px; padding: 24px; }
+
+        /* SIDE LIVE CHAT */
+        .chat-sidebar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 100vh;
+            background: var(--bg-modal);
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            z-index: 90;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+        .chat-sidebar.open {
+            transform: translateX(0);
+        }
+
+        .chat-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        
+        /* ONLINE COUNTER */
+        .chat-online-counter {
+            background: #0b0e14;
+            padding: 6px 16px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .online-dot {
+            width: 7px;
+            height: 7px;
+            background-color: var(--accent-green);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent-green);
+        }
+        .online-count-num {
+            color: white;
+            font-weight: 700;
+        }
+
+        .close-chat-trigger {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .chat-messages-container {
+            flex-grow: 1;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .chat-msg {
+            font-size: 13px;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+        .chat-username {
+            font-weight: 700;
+            color: var(--accent-yellow);
+            margin-right: 5px;
+        }
+        .chat-text {
+            color: #e2e8f0;
+        }
+
+        .chat-footer {
+            padding: 12px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 8px;
+            background: #0b0e14;
+        }
+        .chat-input {
+            flex-grow: 1;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: white;
+            font-size: 13px;
+            outline: none;
+        }
+        .chat-send-btn {
+            background: var(--accent-green);
+            color: #000;
+            border: none;
+            padding: 0 14px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        /* TOGGLE CHAT BUTTON */
+        .toggle-chat-tab-btn {
+            position: fixed;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--bg-modal);
+            border: 1px solid var(--border-color);
+            border-right: none;
+            color: white;
+            padding: 12px 8px;
+            border-radius: 8px 0 0 8px;
+            cursor: pointer;
+            z-index: 85;
+            font-weight: 700;
+            font-size: 12px;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="top-bar">
-            <div class="balance-display">🟡 <span id="user-balance">500.00</span></div>
-            <button class="open-wallet-btn" onclick="toggleWallet(true)">Deposit</button>
-        </div>
+    <div class="main-layout" id="main-layout-content">
+        <div class="container">
+            <div class="top-bar">
+                <div class="balance-display">🪙 <span id="user-balance">500.00</span></div>
+                <button class="open-wallet-btn" onclick="toggleWallet(true)">Deposit</button>
+            </div>
 
-        <div class="games-section" id="main-games-menu">
-            <div class="games-title">🎮 Games</div>
-            <div class="games-grid">
-                <div class="game-card game-cases" onclick="selectGame('cases')"><div class="game-label">Cases</div></div>
-                <div class="game-card game-battles" onclick="selectGame('battles')"><div class="game-label">Battles</div></div>
-                <div class="game-card game-double" onclick="selectGame('double')"><div class="game-label">Double</div></div>
-                <div class="game-card game-upgrader" onclick="selectGame('upgrader')"><div class="game-label">Upgrader</div></div>
+            <div class="games-section" id="main-games-menu">
+                <div class="games-title">🎮 Games</div>
+                <div class="games-grid">
+                    <div class="game-card game-cases" onclick="selectGame('cases')"><div class="game-label">Cases</div></div>
+                    <div class="game-card game-battles" onclick="selectGame('battles')"><div class="game-label">Bars</div></div>
+                    <div class="game-card game-double" onclick="selectGame('double')"><div class="game-label">Double</div></div>
+                    <div class="game-card game-upgrader" onclick="selectGame('upgrader')"><div class="game-label">Upgrader</div></div>
+                </div>
+            </div>
+
+            <div class="game-play-zone" id="play-zone">
+                
+                <button class="back-to-home-btn" onclick="returnToHome()">← Back to Main</button>
+
+                <div id="interface-double" style="display:none;">
+                    <div class="roulette-wrapper">
+                        <div class="roulette-pointer"></div>
+                        
+                        <div class="cell-center-status" id="timer-status-box">
+                            Rolling In
+                            <span id="countdown-timer">10.00</span>
+                        </div>
+
+                        <div class="roulette-container" id="roulette-view-block">
+                            <div class="roulette-track" id="wheel-track"></div>
+                        </div>
+                    </div>
+
+                    <div class="bet-control-panel">
+                        <div class="bet-input-container">
+                            <span style="margin-right:8px;">Amount</span>
+                            <input type="number" class="double-bet-input" id="double-bet-amount" value="0.00" min="0" step="1">
+                        </div>
+                        <div class="bet-btn-group">
+                            <button class="bet-util-btn" onclick="adjustBet('clear')">Clear</button>
+                            <button class="bet-util-btn" onclick="adjustBet(1)">+1</button>
+                            <button class="bet-util-btn" onclick="adjustBet(10)">+10</button>
+                            <button class="bet-util-btn" onclick="adjustBet('double')">2X</button>
+                            <button class="bet-util-btn" onclick="adjustBet('max')">MAX</button>
+                        </div>
+                    </div>
+
+                    <div class="bet-selectors-grid">
+                        <div class="side-bet-card" id="card-t" onclick="placeSideBet('t')">
+                            <div class="side-header"><span class="side-title t-style">⚔ PLAY T</span><span>2x</span></div>
+                            <div class="players-count-row"><span>0 Players</span><span id="pool-t">🪙 0.00</span></div>
+                        </div>
+                        <div class="side-bet-card" id="card-rain" onclick="placeSideBet('rain')">
+                            <div class="side-header"><span class="side-title rain-style">⭐ PLAY STAR</span><span>7x</span></div>
+                            <div class="players-count-row"><span>0 Players</span><span id="pool-rain">🪙 0.00</span></div>
+                        </div>
+                        <div class="side-bet-card" id="card-ct" onclick="placeSideBet('ct')">
+                            <div class="side-header"><span class="side-title ct-style">🛡 PLAY CT</span><span>2x</span></div>
+                            <div class="players-count-row"><span>0 Players</span><span id="pool-ct">🪙 0.00</span></div>
+                        </div>
+                        <div class="side-bet-card" id="card-bait" onclick="placeSideBet('bait')">
+                            <div class="side-header"><span class="side-title bait-style">🐓 PLAY BAIT</span><span>14x</span></div>
+                            <div class="players-count-row"><span>0 Players</span><span id="pool-bait">🪙 0.00</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="interface-generic" style="display:none; padding: 20px; text-align: center; color: var(--text-muted);">
+                    Game mode is activated.
+                </div>
             </div>
         </div>
+    </div>
 
-        <div class="game-play-zone" id="play-zone">
-            
-            <button class="back-to-home-btn" onclick="returnToHome()">← Back to Main</button>
+    <button class="toggle-chat-tab-btn" id="open-chat-tab" onclick="toggleLiveChat(true)">💬 Live Chat</button>
 
-            <div id="interface-double" style="display:none;">
-                <div class="roulette-wrapper">
-                    <div class="roulette-pointer"></div>
-                    
-                    <div class="cell-center-status" id="timer-status-box">
-                        Rolling In
-                        <span id="countdown-timer">10.00</span>
-                    </div>
+    <div class="chat-sidebar" id="live-chat-sidebar">
+        <div class="chat-header">
+            <span>💬 Live Chat</span>
+            <button class="close-chat-trigger" onclick="toggleLiveChat(false)">&times;</button>
+        </div>
+        
+        <div class="chat-online-counter">
+            <div class="online-dot"></div>
+            <span>Online: <span class="online-count-num" id="site-online-count">1</span></span>
+        </div>
 
-                    <div class="roulette-container" id="roulette-view-block">
-                        <div class="roulette-track" id="wheel-track"></div>
-                    </div>
-                </div>
-
-                <div class="bet-control-panel">
-                    <div class="bet-input-container">
-                        <span style="margin-right:8px;">🟡</span>
-                        <input type="number" class="double-bet-input" id="double-bet-amount" value="0.00">
-                    </div>
-                    <div class="bet-btn-group">
-                        <button class="bet-util-btn" onclick="adjustBet('clear')">Clear</button>
-                        <button class="bet-util-btn" onclick="adjustBet(1)">+1</button>
-                        <button class="bet-util-btn" onclick="adjustBet(10)">+10</button>
-                        <button class="bet-util-btn" onclick="adjustBet('double')">2X</button>
-                        <button class="bet-util-btn" onclick="adjustBet('max')">MAX</button>
-                    </div>
-                </div>
-
-                <div class="bet-selectors-grid">
-                    <div class="side-bet-card" onclick="placeSideBet('t')">
-                        <div class="side-header"><span class="side-title t-style">⚔ PLAY T</span><span>2x</span></div>
-                        <div class="players-count-row"><span>0 Players</span><span id="pool-t">🟡 0.00</span></div>
-                    </div>
-                    <div class="side-bet-card" onclick="placeSideBet('rain')">
-                        <div class="side-header"><span class="side-title rain-style">⭐ PLAY STAR</span><span>7x</span></div>
-                        <div class="players-count-row"><span>0 Players</span><span id="pool-rain">🟡 0.00</span></div>
-                    </div>
-                    <div class="side-bet-card" onclick="placeSideBet('ct')">
-                        <div class="side-header"><span class="side-title ct-style">🛡 PLAY CT</span><span>2x</span></div>
-                        <div class="players-count-row"><span>0 Players</span><span id="pool-ct">🟡 0.00</span></div>
-                    </div>
-                    <div class="side-bet-card" onclick="placeSideBet('bait')">
-                        <div class="side-header"><span class="side-title bait-style">🐓 PLAY BAIT</span><span>14x</span></div>
-                        <div class="players-count-row"><span>0 Players</span><span id="pool-bait">🟡 0.00</span></div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="interface-generic" style="display:none; padding: 20px; text-align: center; color: var(--text-muted);">
-                Game mode is activated.
-            </div>
+        <div class="chat-messages-container" id="chat-messages-box"></div>
+        
+        <div class="chat-footer">
+            <input type="text" class="chat-input" id="chat-user-input" placeholder="Type a message..." onkeydown="if(event.key === 'Enter') sendChatMessage()">
+            <button class="chat-send-btn" onclick="sendChatMessage()">Send</button>
         </div>
     </div>
 
@@ -345,7 +520,9 @@
         const viewBlock = document.getElementById('roulette-view-block');
 
         let wheelPattern = [];
-        const cellWidth = 81; // 75px + 6px gap
+        const cellWidth = 81; 
+        let isRolling = false;
+        let lastWinningIndex = 25; 
 
         function updateBalanceDisplay() {
             document.getElementById('user-balance').innerText = coinBalance.toFixed(2);
@@ -355,6 +532,44 @@
             document.getElementById('wallet-modal').classList.toggle('active', show);
         }
 
+        function toggleLiveChat(show) {
+            const sidebar = document.getElementById('live-chat-sidebar');
+            const layout = document.getElementById('main-layout-content');
+            const tabBtn = document.getElementById('open-chat-tab');
+
+            if(show) {
+                sidebar.classList.add('open');
+                tabBtn.style.display = 'none';
+                if(window.innerWidth > 1200) {
+                    layout.style.marginRight = '300px';
+                }
+            } else {
+                sidebar.classList.remove('open');
+                tabBtn.style.display = 'flex';
+                layout.style.marginRight = '0px';
+            }
+            setTimeout(resetToPosition, 150);
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chat-user-input');
+            const text = input.value.trim();
+            if(!text) return;
+
+            appendMessage("You", text);
+            input.value = "";
+        }
+
+        function appendMessage(user, msgText) {
+            const container = document.getElementById('chat-messages-box');
+            if (!container) return;
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'chat-msg';
+            msgDiv.innerHTML = `<span class="chat-username">${user}:</span><span class="chat-text">${msgText}</span>`;
+            container.appendChild(msgDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
         function selectGame(game) {
             document.getElementById('main-games-menu').style.display = 'none'; 
             document.getElementById('play-zone').classList.add('active'); 
@@ -362,7 +577,7 @@
             if(game === 'double') {
                 document.getElementById('interface-double').style.display = 'block';
                 document.getElementById('interface-generic').style.display = 'none';
-                resetToCenter();
+                resetToPosition();
             } else {
                 document.getElementById('interface-double').style.display = 'none';
                 document.getElementById('interface-generic').style.display = 'block';
@@ -375,6 +590,7 @@
         }
 
         function adjustBet(action) {
+            if (isRolling) return;
             let input = document.getElementById('double-bet-amount');
             let current = parseFloat(input.value) || 0;
             if (action === 'clear') input.value = "0.00";
@@ -384,15 +600,21 @@
         }
 
         function placeSideBet(side) {
+            if (isRolling) return;
             let amt = parseFloat(document.getElementById('double-bet-amount').value) || 0;
             if(amt <= 0 || amt > coinBalance) return;
             coinBalance -= amt;
             activeBets[side] += amt;
             updateBalanceDisplay();
-            document.getElementById(`pool-${side}`).innerText = `🟡 ${activeBets[side].toFixed(2)}`;
+            document.getElementById(`pool-${side}`).innerText = `🪙 ${activeBets[side].toFixed(2)}`;
+            
+            // Оновлюємо лічильник гравців (показує 1, якщо ти поставив)
+            let card = document.getElementById(`card-${side}`);
+            if(card) {
+                card.querySelector('.players-count-row span:first-child').innerText = "1 Players";
+            }
         }
 
-        // TRACK TRACK PATTERN (Stars strictly wrap the Bait item)
         function generatePattern() {
             wheelPattern = [];
             let baseBlock = ['t', 'ct', 't', 'ct', 'rain', 'bait', 'rain', 't', 'ct', 't', 'ct', 't', 'ct'];
@@ -410,19 +632,23 @@
             });
         }
 
-        function resetToCenter() {
+        function resetToPosition() {
+            if(!track || !viewBlock) return;
             track.style.transition = 'none';
-            let initialIndex = 25; 
-            let centerOffset = -(initialIndex * cellWidth) + (viewBlock.offsetWidth / 2) - (cellWidth / 2);
+            let centerOffset = -(lastWinningIndex * cellWidth) + (viewBlock.offsetWidth / 2) - (cellWidth / 2) + 3;
             track.style.transform = `translateX(${centerOffset}px)`;
         }
 
+        function setControlsDisabled(disabled) {
+            document.querySelectorAll('.bet-util-btn').forEach(btn => btn.disabled = disabled);
+            document.querySelectorAll('.side-bet-card').forEach(card => card.classList.toggle('disabled', disabled));
+        }
+
         function startRouletteSystem() {
-            generatePattern();
-            resetToCenter();
-            
+            isRolling = false;
+            setControlsDisabled(false);
             timerBox.style.display = 'flex';
-            let timeLeft = 10.00; // Strict 10.00s Countdown
+            let timeLeft = 10.00; 
 
             let timerInterval = setInterval(() => {
                 timeLeft -= 0.01;
@@ -437,10 +663,15 @@
         }
 
         function executeRoll() {
-            let winningIndex = 90 + Math.floor(Math.random() * 20);
-            let winningType = wheelPattern[winningIndex];
+            if (isRolling) return;
+            isRolling = true;
+            setControlsDisabled(true);
 
-            let centerOffset = -(winningIndex * cellWidth) + (viewBlock.offsetWidth / 2) - (cellWidth / 2);
+            let winningIndex = 110 + Math.floor(Math.random() * 20);
+            let winningType = wheelPattern[winningIndex];
+            lastWinningIndex = winningIndex;
+
+            let centerOffset = -(winningIndex * cellWidth) + (viewBlock.offsetWidth / 2) - (cellWidth / 2) + 3;
 
             track.style.transition = 'transform 4.5s cubic-bezier(0.05, 0.85, 0.1, 1)';
             track.style.transform = `translateX(${centerOffset}px)`;
@@ -454,20 +685,35 @@
 
                 if(userWon > 0) {
                     coinBalance += userWon;
-                    alert(`🎉 Landed on: ${symbols[winningType]}! You won 🟡 ${userWon.toFixed(2)}`);
+                    alert(`🎉 Landed on: ${symbols[winningType]}! You won 🪙 ${userWon.toFixed(2)}`);
                 }
 
+                // Скидання ставок та лічильників
                 activeBets = { t: 0, rain: 0, ct: 0, bait: 0 };
-                document.querySelectorAll('[id^="pool-"]').forEach(el => el.innerText = "🟡 0.00");
+                document.querySelectorAll('[id^="pool-"]').forEach(el => el.innerText = "🪙 0.00");
+                document.querySelectorAll('.side-bet-card .players-count-row span:first-child').forEach(el => el.innerText = "0 Players");
                 updateBalanceDisplay();
 
-                setTimeout(startRouletteSystem, 2000);
-            }, 4800);
+                setTimeout(() => {
+                    lastWinningIndex = 25; 
+                    wheelPattern[25] = winningType; 
+                    if(track.children[25]) {
+                        track.children[25].className = `roulette-cell cell-${winningType}`;
+                        track.children[25].innerText = symbols[winningType];
+                    }
+                    resetToPosition();
+                    startRouletteSystem();
+                }, 1000);
+
+            }, 4600);
         }
 
+        // Ініціалізація
         updateBalanceDisplay();
-        startRouletteSystem();
-        window.addEventListener('resize', resetToCenter);
+        generatePattern();
+        
+        setTimeout(startRouletteSystem, 200);
+        window.addEventListener('resize', resetToPosition);
     </script>
 </body>
 </html>
