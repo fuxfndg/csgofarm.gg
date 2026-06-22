@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CS2 Platform - Responsive Pure Crypto</title>
+    <title>CS2 Platform - Double Roulette</title>
     <style>
         :root {
             --bg-main: #0b0e14;
@@ -13,9 +13,13 @@
             --text-main: #ffffff;
             --text-muted: #626e85;
             --accent-green: #10b981;
-            --accent-yellow: #ca8a04;
+            --accent-yellow: #f59e0b;
             --border-color: #242c3e;
-            --danger-red: #ef4444;
+
+            --color-t: #ca8a04;
+            --color-rain: #3b82f6; 
+            --color-ct: #4b5563;
+            --color-bait: #10b981; 
         }
 
         * {
@@ -37,7 +41,6 @@
             gap: 20px;
         }
 
-        /* АДАПТИВНИЙ КОНТЕЙНЕР ПЛАТФОРМИ */
         .container {
             width: 100%;
             max-width: 1000px;
@@ -46,7 +49,7 @@
             gap: 20px;
         }
 
-        /* ТОР-БАР */
+        /* TOP BAR */
         .top-bar {
             width: 100%;
             display: flex;
@@ -62,7 +65,7 @@
         .balance-display {
             font-size: 16px;
             font-weight: 700;
-            color: #f59e0b;
+            color: var(--accent-yellow);
             background: rgba(245, 158, 11, 0.1);
             padding: 6px 16px;
             border-radius: 6px;
@@ -77,265 +80,394 @@
             font-weight: 700;
             border-radius: 6px;
             cursor: pointer;
-            text-transform: uppercase;
-            transition: background 0.2s;
-        }
-        .open-wallet-btn:hover { background: #0ece7e; }
-
-        /* ІГРИ (ГРИД З АДАПТИВНІСТЮ СТОРІНКИ) */
-        .games-section { width: 100%; }
-        .games-title { font-size: 18px; font-weight: 700; margin-bottom: 15px; display: flex; align-items: center; gap: 6px; }
-        
-        .games-grid { 
-            display: grid; 
-            grid-template-columns: repeat(4, 1fr); 
-            gap: 16px; 
         }
 
-        @media (max-width: 768px) {
-            .games-grid { grid-template-columns: repeat(2, 1fr); }
+        /* MAIN HOME PAGE (GAMES SECTION) */
+        .games-section { 
+            width: 100%; 
+            display: block; 
         }
-        @media (max-width: 480px) {
-            .games-grid { grid-template-columns: 1fr; }
-        }
+        .games-title { font-size: 18px; font-weight: 700; margin-bottom: 15px; }
+        .games-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 
         .game-card {
             height: 140px; border-radius: 12px; overflow: hidden; cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s; display: flex; align-items: flex-end; padding: 16px;
+            transition: transform 0.2s; display: flex; align-items: flex-end; padding: 16px;
         }
-        .game-card:hover { transform: translateY(-4px); box-shadow: 0 8px 16px rgba(0,0,0,0.3); }
-        .game-card.active-playing { border: 2px solid #3b82f6; }
+        .game-card:hover { transform: translateY(-4px); }
         .game-cases { background: linear-gradient(135deg, #d97706, #78350f); }
         .game-battles { background: linear-gradient(135deg, #dc2626, #7f1d1d); }
         .game-double { background: linear-gradient(135deg, #2563eb, #1e3a8a); }
         .game-upgrader { background: linear-gradient(135deg, #7c3aed, #4c1d95); }
         .game-label { background: rgba(0, 0, 0, 0.6); padding: 6px 14px; border-radius: 6px; font-weight: 800; font-size: 13px; text-transform: uppercase; }
 
-        /* ІГРОВА ЗОНА */
+        /* BACK BUTTON */
+        .back-to-home-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        .back-to-home-btn:hover { background: var(--bg-card-hover); }
+
+        /* GAME PLAY ZONE */
         .game-play-zone { width: 100%; background: var(--bg-modal); border-radius: 12px; padding: 24px; border: 1px solid var(--border-color); display: none; }
         .game-play-zone.active { display: block; }
-        .game-interface { display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 10px 0; }
-        .bet-input { background: var(--bg-main); border: 1px solid var(--border-color); padding: 10px; border-radius: 6px; color: #fff; text-align: center; font-weight: 700; width: 120px; }
-        .action-btn { background: #f59e0b; color: #000; border: none; padding: 12px 30px; font-weight: 700; border-radius: 6px; cursor: pointer; text-transform: uppercase; }
 
-        /* МОДАЛЬНЕ ВІКНО */
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 100; padding: 15px; }
-        .modal-overlay.active { display: flex; }
-        
-        .modal-wallet { 
-            background-color: var(--bg-modal); 
-            width: 100%; 
-            max-width: 480px; 
-            border-radius: 12px; 
-            padding: 24px; 
-            position: relative; 
-            max-height: 95vh; 
-            overflow-y: auto; 
+        /* ROULETTE WITH NO EMPTY SPACE */
+        .roulette-wrapper {
+            position: relative;
+            width: 100%;
+            background: #0b0e14;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px 0;
+            overflow: hidden;
+            margin-bottom: 20px;
         }
-        
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        .modal-title { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
-        .back-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 18px; display: none; }
-        .close-btn { background: var(--bg-card); border: none; color: var(--text-muted); width: 32px; height: 32px; border-radius: 6px; cursor: pointer; font-size: 18px; }
 
-        /* ДЕПОЗИТ КРИПТИ (ПО СТАНДАРТУ СКРІНШОТІВ) */
-        .crypto-deposit-screen { display: flex; flex-direction: column; gap: 16px; }
-        .promo-banner { background: rgba(16, 185, 129, 0.1); color: var(--accent-green); padding: 12px; border-radius: 6px; font-weight: 600; font-size: 13px; text-align: center; border: 1px solid rgba(16, 185, 129, 0.15); }
-        
-        .field-label { font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
-        .crypto-select { background: #0b0e14; border: 1px solid var(--border-color); width: 100%; padding: 12px; color: white; border-radius: 6px; font-weight: 600; outline: none; }
-        
-        .address-container { display: flex; background: #0b0e14; border: 1px solid var(--border-color); border-radius: 6px; align-items: center; padding-right: 12px; }
-        .address-input { flex-grow: 1; background: transparent; border: none; padding: 12px; color: #a1a1aa; font-family: monospace; font-size: 13px; outline: none; text-overflow: ellipsis; }
-        .copy-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 15px; }
-        .copy-btn:hover { color: white; }
+        .roulette-pointer {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 100%;
+            background: var(--accent-yellow);
+            z-index: 10;
+            box-shadow: 0 0 10px var(--accent-yellow);
+        }
 
-        /* БЛОК З КВАДРАТНИМ QR */
-        .qr-info-block { display: flex; gap: 16px; background: rgba(28, 34, 48, 0.3); padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); }
-        
-        /* Чіткі розміри щоб QR завжди залишався рівним 1:1 */
-        .qr-wrapper {
-            width: 100px;
-            min-width: 100px;
-            height: 100px;
-            background: white;
-            padding: 6px;
-            border-radius: 6px;
+        .roulette-container {
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .roulette-track {
+            display: flex;
+            gap: 6px;
+            width: max-content;
+            will-change: transform;
+        }
+
+        .roulette-cell {
+            width: 75px;
+            min-width: 75px;
+            height: 75px;
+            background: var(--bg-card);
+            border-radius: 8px;
             display: flex;
             justify-content: center;
             align-items: center;
-            aspect-ratio: 1 / 1; /* Квадратний формат */
+            font-size: 24px;
+            font-weight: 700;
         }
-        .qr-wrapper img { width: 100%; height: 100%; object-fit: contain; }
 
-        .info-text-box { display: flex; flex-direction: column; justify-content: center; font-size: 12px; color: var(--text-muted); line-height: 1.4; }
-        .info-text-box strong { color: white; }
+        .cell-t { background: linear-gradient(135deg, #4c3c15, #241c05); border: 1px solid var(--color-t); color: var(--color-t); }
+        .cell-rain { background: linear-gradient(135deg, #1d3a8a, #0f172a); border: 1px solid var(--color-rain); color: #60a5fa; }
+        .cell-ct { background: linear-gradient(135deg, #2b2f3a, #12151c); border: 1px solid var(--color-ct); color: #9ca3af; }
+        .cell-bait { background: linear-gradient(135deg, #064e3b, #022c22); border: 1px solid var(--color-bait); color: var(--color-bait); }
 
-        .danger-alert { border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; background: rgba(239, 68, 68, 0.04); padding: 10px 14px; border-radius: 6px; font-size: 11px; font-weight: 600; text-align: center; }
+        .cell-center-status {
+            position: absolute;
+            background: rgba(11, 14, 20, 0.95);
+            border: 2px solid var(--accent-yellow);
+            border-radius: 8px;
+            width: 110px;
+            height: 55px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--text-muted);
+            z-index: 15;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .cell-center-status span { color: white; font-size: 14px; margin-top: 2px; font-family: monospace; }
 
-        /* КОЇН КАЛЬКУЛЯТОР */
-        .calc-row { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
-        .calc-input-wrap { flex: 1; background: #0b0e14; border: 1px solid var(--border-color); border-radius: 6px; display: flex; align-items: center; padding: 0 12px; }
-        .calc-icon { margin-right: 8px; font-size: 13px; }
-        .calc-input { background: transparent; border: none; width: 100%; padding: 12px 0; color: white; font-weight: 700; outline: none; font-size: 14px; }
-        .swap-arrow { color: var(--text-muted); font-size: 16px; }
-        .calc-footer-note { font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 6px; line-height: 1.4; }
+        /* BET CONTROL PANEL */
+        .bet-control-panel {
+            background: #0b0e14;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .bet-input-container {
+            display: flex;
+            align-items: center;
+            background: var(--bg-modal);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 0 12px;
+            flex-grow: 1;
+        }
+        .double-bet-input {
+            background: transparent; border: none; color: white; padding: 10px 0; width: 100%; font-weight: 700; outline: none;
+        }
+
+        .bet-btn-group { display: flex; gap: 4px; }
+        .bet-util-btn {
+            background: var(--bg-card); border: 1px solid var(--border-color); color: white; padding: 8px 12px; border-radius: 4px; font-size: 11px; font-weight: 700; cursor: pointer;
+        }
+
+        .bet-selectors-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        .side-bet-card {
+            background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; cursor: pointer; display: flex; flex-direction: column; gap: 10px;
+        }
+        .side-header { display: flex; justify-content: space-between; align-items: center; }
+        .side-title { font-size: 12px; font-weight: 800; text-transform: uppercase; }
+        
+        .side-title.t-style { color: var(--color-t); }
+        .side-title.rain-style { color: #60a5fa; }
+        .side-title.ct-style { color: #9ca3af; }
+        .side-title.bait-style { color: var(--color-bait); }
+
+        .players-count-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); }
+
+        /* WALLET MODAL */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 100; }
+        .modal-overlay.active { display: flex; }
+        .modal-wallet { background-color: var(--bg-modal); width: 100%; max-width: 450px; border-radius: 12px; padding: 24px; }
     </style>
 </head>
 <body>
 
     <div class="container">
         <div class="top-bar">
-            <div class="balance-display">Баланс: $<span id="user-balance">100.00</span></div>
+            <div class="balance-display">🟡 <span id="user-balance">500.00</span></div>
             <button class="open-wallet-btn" onclick="toggleWallet(true)">Deposit</button>
         </div>
 
-        <div class="games-section">
+        <div class="games-section" id="main-games-menu">
             <div class="games-title">🎮 Games</div>
             <div class="games-grid">
-                <div class="game-card game-cases" id="card-cases" onclick="selectGame('cases')"><div class="game-label">Cases</div></div>
-                <div class="game-card game-battles" id="card-battles" onclick="selectGame('battles')"><div class="game-label">Battles</div></div>
-                <div class="game-card game-double" id="card-double" onclick="selectGame('double')"><div class="game-label">Double</div></div>
-                <div class="game-card game-upgrader" id="card-upgrader" onclick="selectGame('upgrader')"><div class="game-label">Upgrader</div></div>
+                <div class="game-card game-cases" onclick="selectGame('cases')"><div class="game-label">Cases</div></div>
+                <div class="game-card game-battles" onclick="selectGame('battles')"><div class="game-label">Battles</div></div>
+                <div class="game-card game-double" onclick="selectGame('double')"><div class="game-label">Double</div></div>
+                <div class="game-card game-upgrader" onclick="selectGame('upgrader')"><div class="game-label">Upgrader</div></div>
             </div>
         </div>
 
         <div class="game-play-zone" id="play-zone">
-            <h2 id="active-game-title" style="text-transform: uppercase; margin-bottom: 10px; font-size: 16px;">Гра</h2>
-            <div id="interface-cases" class="game-interface" style="display:none;">
-                <p>Вартість відкриття кейсу: <strong>$10.00</strong></p>
-                <div id="case-result" style="font-size: 16px; font-weight: bold; color: #ca8a04; min-height: 20px;"></div>
-                <button class="action-btn" onclick="playCases()">Відкрити</button>
+            
+            <button class="back-to-home-btn" onclick="returnToHome()">← Back to Main</button>
+
+            <div id="interface-double" style="display:none;">
+                <div class="roulette-wrapper">
+                    <div class="roulette-pointer"></div>
+                    
+                    <div class="cell-center-status" id="timer-status-box">
+                        Rolling In
+                        <span id="countdown-timer">10.00</span>
+                    </div>
+
+                    <div class="roulette-container" id="roulette-view-block">
+                        <div class="roulette-track" id="wheel-track"></div>
+                    </div>
+                </div>
+
+                <div class="bet-control-panel">
+                    <div class="bet-input-container">
+                        <span style="margin-right:8px;">🟡</span>
+                        <input type="number" class="double-bet-input" id="double-bet-amount" value="0.00">
+                    </div>
+                    <div class="bet-btn-group">
+                        <button class="bet-util-btn" onclick="adjustBet('clear')">Clear</button>
+                        <button class="bet-util-btn" onclick="adjustBet(1)">+1</button>
+                        <button class="bet-util-btn" onclick="adjustBet(10)">+10</button>
+                        <button class="bet-util-btn" onclick="adjustBet('double')">2X</button>
+                        <button class="bet-util-btn" onclick="adjustBet('max')">MAX</button>
+                    </div>
+                </div>
+
+                <div class="bet-selectors-grid">
+                    <div class="side-bet-card" onclick="placeSideBet('t')">
+                        <div class="side-header"><span class="side-title t-style">⚔ PLAY T</span><span>2x</span></div>
+                        <div class="players-count-row"><span>0 Players</span><span id="pool-t">🟡 0.00</span></div>
+                    </div>
+                    <div class="side-bet-card" onclick="placeSideBet('rain')">
+                        <div class="side-header"><span class="side-title rain-style">⭐ PLAY STAR</span><span>7x</span></div>
+                        <div class="players-count-row"><span>0 Players</span><span id="pool-rain">🟡 0.00</span></div>
+                    </div>
+                    <div class="side-bet-card" onclick="placeSideBet('ct')">
+                        <div class="side-header"><span class="side-title ct-style">🛡 PLAY CT</span><span>2x</span></div>
+                        <div class="players-count-row"><span>0 Players</span><span id="pool-ct">🟡 0.00</span></div>
+                    </div>
+                    <div class="side-bet-card" onclick="placeSideBet('bait')">
+                        <div class="side-header"><span class="side-title bait-style">🐓 PLAY BAIT</span><span>14x</span></div>
+                        <div class="players-count-row"><span>0 Players</span><span id="pool-bait">🟡 0.00</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="interface-generic" style="display:none; padding: 20px; text-align: center; color: var(--text-muted);">
+                Game mode is activated.
             </div>
         </div>
     </div>
 
     <div class="modal-overlay" id="wallet-modal">
         <div class="modal-wallet">
-            
-            <div class="modal-header">
-                <div class="modal-title">
-                    <span id="wallet-header-title">Deposit with Crypto</span>
-                </div>
-                <button class="close-btn" onclick="toggleWallet(false)">&times;</button>
+            <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:700;">
+                <span>Deposit</span>
+                <span style="cursor:pointer;" onclick="toggleWallet(false)">&times;</span>
             </div>
-
-            <div class="crypto-deposit-screen">
-                <div class="promo-banner">Promotion active: +5% Deposit Bonus</div>
-                
-                <div>
-                    <div class="field-label">Currency</div>
-                    <select class="crypto-select">
-                        <option>🪙 LTC (Litecoin)</option>
-                    </select>
-                </div>
-
-                <div>
-                    <div class="field-label">Deposit address</div>
-                    <div class="address-container">
-                        <input type="text" class="address-input" id="deposit-address-field" value="ltc1qa2cphrk74vepmm5e6gel7rafyxtglx9vrqrry7" readonly>
-                        <button class="copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('deposit-address-field').value); alert('Адресу скопійовано!')">📋</button>
-                    </div>
-                </div>
-
-                <div class="qr-info-block">
-                    <div class="qr-wrapper">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=ltc1qa2cphrk74vepmm5e6gel7rafyxtglx9vrqrry7" alt="LTC QR">
-                    </div>
-                    <div class="info-text-box">
-                        <p>Send the amount of Litecoin of your choice to the following address to receive the equivalent in coins.</p>
-                        <p style="margin-top: 6px;"><strong>Minimum deposit: $10.00 USD</strong> ℹ</p>
-                        <p>Required confirmations: 2</p>
-                    </div>
-                </div>
-
-                <div class="danger-alert">
-                    Only deposit over the LTC network. Do not use BNB or BSC networks
-                </div>
-
-                <div>
-                    <div class="field-label">Coin Calculator</div>
-                    <div class="calc-row">
-                        <div class="calc-input-wrap">
-                            <span class="calc-icon">🟡</span>
-                            <input type="number" class="calc-input" id="calc-coins" value="100" oninput="convertCoinsToLtc()">
-                        </div>
-                        <div class="swap-arrow">⇄</div>
-                        <div class="calc-input-wrap">
-                            <span class="calc-icon">🪙</span>
-                            <input type="number" class="calc-input" id="calc-ltc" value="0.769230" oninput="convertLtcToCoins()">
-                        </div>
-                    </div>
-                    <div class="calc-footer-note">
-                        The exchange rate shown above is an estimate. The final rate is determined by the time of the transaction.
-                    </div>
-                </div>
-            </div>
-
+            <p style="color:var(--text-muted); font-size:14px;">Deposit Address: <br><code style="color:white;">ltc1qa2cphrk74vepmm5e6gel7rafyxtglx9vrqrry7</code></p>
         </div>
     </div>
 
     <script>
-        let balance = 100.00;
-        const LTC_PRICE_USD = 65.00; // Фіксована константа ціни за 1 LTC для калькулятора
+        let coinBalance = 500.00; 
+        let activeBets = { t: 0, rain: 0, ct: 0, bait: 0 };
+        const symbols = { t: '⚔', rain: '⭐', ct: '🛡', bait: '🐓' };
+        
+        const track = document.getElementById('wheel-track');
+        const timerBox = document.getElementById('timer-status-box');
+        const countdownEl = document.getElementById('countdown-timer');
+        const viewBlock = document.getElementById('roulette-view-block');
+
+        let wheelPattern = [];
+        const cellWidth = 81; // 75px + 6px gap
 
         function updateBalanceDisplay() {
-            document.getElementById('user-balance').innerText = balance.toFixed(2);
+            document.getElementById('user-balance').innerText = coinBalance.toFixed(2);
         }
 
         function toggleWallet(show) {
             document.getElementById('wallet-modal').classList.toggle('active', show);
-            if(show) {
-                // Скидаємо розрахунок на 100 коїнів за дефолтом при відкритті
-                document.getElementById('calc-coins').value = 100;
-                convertCoinsToLtc();
+        }
+
+        function selectGame(game) {
+            document.getElementById('main-games-menu').style.display = 'none'; 
+            document.getElementById('play-zone').classList.add('active'); 
+
+            if(game === 'double') {
+                document.getElementById('interface-double').style.display = 'block';
+                document.getElementById('interface-generic').style.display = 'none';
+                resetToCenter();
+            } else {
+                document.getElementById('interface-double').style.display = 'none';
+                document.getElementById('interface-generic').style.display = 'block';
             }
         }
 
-        // 1 коін = 0.5$ (тобто 100 коїнів = $50. $50 ділимо на курс LTC ($65) = 0.769230 LTC)
-        function convertCoinsToLtc() {
-            const coinsInput = document.getElementById('calc-coins');
-            const ltcInput = document.getElementById('calc-ltc');
-            
-            let coins = parseFloat(coinsInput.value);
-            if (isNaN(coins) || coins < 0) coins = 0;
-
-            let totalUsd = coins * 0.5;
-            let totalLtc = totalUsd / LTC_PRICE_USD;
-
-            ltcInput.value = totalLtc.toFixed(6);
+        function returnToHome() {
+            document.getElementById('play-zone').classList.remove('active'); 
+            document.getElementById('main-games-menu').style.display = 'block'; 
         }
 
-        function convertLtcToCoins() {
-            const coinsInput = document.getElementById('calc-coins');
-            const ltcInput = document.getElementById('calc-ltc');
-            
-            let ltc = parseFloat(ltcInput.value);
-            if (isNaN(ltc) || ltc < 0) ltc = 0;
-
-            let totalUsd = ltc * LTC_PRICE_USD;
-            let coins = totalUsd / 0.5;
-
-            coinsInput.value = Math.round(coins);
+        function adjustBet(action) {
+            let input = document.getElementById('double-bet-amount');
+            let current = parseFloat(input.value) || 0;
+            if (action === 'clear') input.value = "0.00";
+            else if (action === 'double') input.value = (current * 2).toFixed(2);
+            else if (action === 'max') input.value = coinBalance.toFixed(2);
+            else input.value = (current + action).toFixed(2);
         }
 
-        // ПРОСТЕ ПЕРЕМИКАННЯ ІГОР
-        function selectGame(game) {
-            document.querySelectorAll('.game-card').forEach(c => c.classList.remove('active-playing'));
-            document.getElementById(`card-${game}`).classList.add('active-playing');
-            document.getElementById('play-zone').classList.add('active');
-            document.getElementById('active-game-title').innerText = game;
-            document.getElementById('interface-cases').style.display = game === 'cases' ? 'flex' : 'none';
-        }
-
-        function playCases() {
-            if (balance < 10) return alert("Недостатньо коштів на балансі!");
-            balance -= 10;
-            let prize = (Math.random() * 20).toFixed(2);
-            balance += parseFloat(prize);
+        function placeSideBet(side) {
+            let amt = parseFloat(document.getElementById('double-bet-amount').value) || 0;
+            if(amt <= 0 || amt > coinBalance) return;
+            coinBalance -= amt;
+            activeBets[side] += amt;
             updateBalanceDisplay();
-            document.getElementById('case-result').innerText = `Випав предмет вартістю $${prize}`;
+            document.getElementById(`pool-${side}`).innerText = `🟡 ${activeBets[side].toFixed(2)}`;
         }
+
+        // TRACK TRACK PATTERN (Stars strictly wrap the Bait item)
+        function generatePattern() {
+            wheelPattern = [];
+            let baseBlock = ['t', 'ct', 't', 'ct', 'rain', 'bait', 'rain', 't', 'ct', 't', 'ct', 't', 'ct'];
+            
+            for (let i = 0; i < 15; i++) {
+                wheelPattern = wheelPattern.concat(baseBlock);
+            }
+
+            track.innerHTML = '';
+            wheelPattern.forEach(type => {
+                let cell = document.createElement('div');
+                cell.className = `roulette-cell cell-${type}`;
+                cell.innerText = symbols[type];
+                track.appendChild(cell);
+            });
+        }
+
+        function resetToCenter() {
+            track.style.transition = 'none';
+            let initialIndex = 25; 
+            let centerOffset = -(initialIndex * cellWidth) + (viewBlock.offsetWidth / 2) - (cellWidth / 2);
+            track.style.transform = `translateX(${centerOffset}px)`;
+        }
+
+        function startRouletteSystem() {
+            generatePattern();
+            resetToCenter();
+            
+            timerBox.style.display = 'flex';
+            let timeLeft = 10.00; // Strict 10.00s Countdown
+
+            let timerInterval = setInterval(() => {
+                timeLeft -= 0.01;
+                if(timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    timerBox.style.display = 'none'; 
+                    executeRoll();
+                } else {
+                    countdownEl.innerText = timeLeft.toFixed(2);
+                }
+            }, 10);
+        }
+
+        function executeRoll() {
+            let winningIndex = 90 + Math.floor(Math.random() * 20);
+            let winningType = wheelPattern[winningIndex];
+
+            let centerOffset = -(winningIndex * cellWidth) + (viewBlock.offsetWidth / 2) - (cellWidth / 2);
+
+            track.style.transition = 'transform 4.5s cubic-bezier(0.05, 0.85, 0.1, 1)';
+            track.style.transform = `translateX(${centerOffset}px)`;
+
+            setTimeout(() => {
+                let userWon = 0;
+                if (winningType === 't') userWon = activeBets.t * 2;
+                if (winningType === 'ct') userWon = activeBets.ct * 2;
+                if (winningType === 'rain') userWon = activeBets.rain * 7;
+                if (winningType === 'bait') userWon = activeBets.bait * 14;
+
+                if(userWon > 0) {
+                    coinBalance += userWon;
+                    alert(`🎉 Landed on: ${symbols[winningType]}! You won 🟡 ${userWon.toFixed(2)}`);
+                }
+
+                activeBets = { t: 0, rain: 0, ct: 0, bait: 0 };
+                document.querySelectorAll('[id^="pool-"]').forEach(el => el.innerText = "🟡 0.00");
+                updateBalanceDisplay();
+
+                setTimeout(startRouletteSystem, 2000);
+            }, 4800);
+        }
+
+        updateBalanceDisplay();
+        startRouletteSystem();
+        window.addEventListener('resize', resetToCenter);
     </script>
 </body>
 </html>
